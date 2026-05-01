@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"/>
+<meta name="description" content="BlakeBet — Virtual Gaming Platform by Agunextech, Nairobi Kenya"/>
+<meta name="author" content="Agunextech"/>
+<title>BlakeBet | Virtual Games Platform | Powered by Agunextech</title>
+<link rel="stylesheet" href="css/styles.css"/>
+<script type="module" src="js/firebase.js"></script>
+</head>
+<body>
+
+<div id="auth">
+  <div class="abox">
+    <div class="a-logo">BlakeBet</div>
+    <div class="a-tag">🎮 Virtual Games Platform — No Real Money</div>
+    <div id="fb-status" style="font-size:.62rem;text-align:center;padding:3px 8px;border-radius:4px;margin-bottom:6px;background:rgba(245,34,45,.1);color:#f5222d;border:1px solid rgba(245,34,45,.2);">⚠️ Local mode — login works on this browser only</div>
+    <div class="a-tabs">
+      <div class="a-tab on" onclick="aTab('login',this)">Login</div>
+      <div class="a-tab" onclick="aTab('register',this)">Register</div>
+    </div>
+    <div id="a-login">
+      <div class="a-lbl">Email</div>
+      <input class="a-inp" id="li-em" type="email" placeholder="you@example.com"/>
+      <div class="a-lbl">Password</div>
+      <input class="a-inp" id="li-pw" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+      <button class="a-btn" onclick="doLogin()">LOGIN</button>
+      <div class="a-err" id="li-err"></div>
+    </div>
+    <div id="a-reg" style="display:none;">
+      <div class="a-lbl">Full Name</div>
+      <input class="a-inp" id="rg-nm" type="text" placeholder="John Doe"/>
+      <div class="a-lbl">Email Address</div>
+      <input class="a-inp" id="rg-em" type="email" placeholder="you@example.com"/>
+      <div class="a-lbl">Phone Number</div>
+      <div class="a-phone-row">
+        <input class="a-inp a-pfx" id="rg-pfx" type="text" value="+254" style="width:64px;flex-shrink:0;margin-bottom:0;"/>
+        <input class="a-inp" id="rg-ph" type="tel" placeholder="712 345 678" style="flex:1;" onkeydown="if(event.key==='Enter')doRegister()"/>
+      </div>
+      <div style="margin-bottom:11px;"></div>
+      <div class="a-lbl">Password</div>
+      <input class="a-inp" id="rg-pw" type="password" placeholder="Min 6 characters"/>
+      <div class="a-lbl">Confirm Password</div>
+      <input class="a-inp" id="rg-pw2" type="password" placeholder="Re-enter password" onkeydown="if(event.key==='Enter')doRegister()"/>
+      <div class="a-lbl">Referral Code <span style="color:var(--t3)">(optional)</span></div>
+      <input class="a-inp" id="rg-ref" type="text" placeholder="Enter referral code if you have one" onkeydown="if(event.key==='Enter')doRegister()"/>
+      <button class="a-btn" onclick="doRegister()">CREATE ACCOUNT</button>
+      <div class="a-bonus">🪙 Get <strong>2,000 FREE AguCoins</strong> on signup!</div>
+      <div class="a-err" id="rg-err"></div>
+    </div>
+    <div class="a-powered">Powered by <a href="https://www.google.com/search?q=Agunextech" target="_blank">Agunextech</a> · Nairobi, Kenya</div>
+  </div>
+</div>
+
+
+<div id="app">
+  
+  <div id="hdr">
+    <div class="h-logo">BlakeBet<small>🎮 Virtual Games Only</small></div>
+    <div class="h-right">
+      <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">🌙</button>
+      <button id="notif-btn" onclick="toggleNotifPanel()">🔔<div id="notif-dot"></div></button>
+      <div class="h-coin" onclick="goPage('profile')">
+        <span>🪙</span>
+        <div><div class="h-clbl">AguCoins</div><div class="h-cval" id="hcv">0</div></div>
+      </div>
+      <div class="h-user" id="h-user"></div>
+    </div>
+  </div>
+
+  
+  <div id="ticker-bar"><div class="ticker-track" id="ticker-inner"></div></div>
+
+  
+  <div id="winners-bar"><div class="winners-track" id="winners-inner"></div></div>
+
+  
+  <div id="content">
+
+    <!-- SPORTS PAGE -->
+    <div class="page on" id="pg-sports">
+      <div style="background:rgba(14,165,233,.08);border:1px solid rgba(14,165,233,.2);border-radius:6px;padding:6px 10px;margin-bottom:8px;font-size:.72rem;color:var(--blue);text-align:center;font-family:var(--fc);letter-spacing:.5px;text-transform:uppercase;">🎮 This is a Virtual Games Platform — AguCoins are not real money</div>
+      <div class="view-tabs">
+        <div class="vtab on" id="vt-live" onclick="setView('live',this)">🔴 Live</div>
+        <div class="vtab" id="vt-next" onclick="setView('next',this)">⏰ Upcoming</div>
+        <div class="vtab" id="vt-table" onclick="setView('table',this)">📊 Table</div>
+        <div class="vtab" id="vt-div2" onclick="setView('div2',this)">📊 Div 2</div>
+        <div class="vtab" id="vt-results" onclick="setView('results',this)">📋 Results</div>
+        <div class="vtab" id="vt-uefa" onclick="setView('uefa',this)">🏆 UEFA</div>
+        <div class="vtab" id="vt-predict" onclick="setView('predict',this)">🎯 Predict</div>
+        <div class="vtab" id="vt-mc" onclick="setView('mc',this)">📺 Centre</div>
+      </div>
+      <div id="sport-body"></div>
+    </div>
+
+    <!-- CASINO PAGE -->
+    <div class="page" id="pg-casino">
+      <div class="casino-nav">
+        <div class="cnav on" id="cn-bv" onclick="casinoSwitch('bv',this)">
+          <span class="cnav-ico">✈️</span>BlakeViator
+        </div>
+        <div class="cnav" id="cn-dice" onclick="casinoSwitch('dice',this)">
+          <span class="cnav-ico">🎲</span>Dice
+        </div>
+        <div class="cnav" id="cn-rou" onclick="casinoSwitch('rou',this)">
+          <span class="cnav-ico">🎡</span>Roulette
+        </div>
+        <div class="cnav" id="cn-slots" onclick="casinoSwitch('slots',this)">
+          <span class="cnav-ico">🎰</span>Slots
+        </div>
+      </div>
+
+      
+      <div class="casino-game on" id="cg-bv">
+        <div class="bv-box">
+          <div class="bv-hist"><span class="bv-hlbl">Last:</span><div id="bv-hist-items" style="display:flex;gap:3px;flex-wrap:wrap;"></div></div>
+          <div id="bv-arena">
+            <canvas id="bv-cv"></canvas>
+            <div id="bv-mult" class="s">—</div>
+            <div id="bv-plane" style="display:none;">✈️</div>
+            <div id="bv-boom">💥</div>
+            <div id="bv-tag"></div>
+          </div>
+          <div id="bv-sound-bar">
+            <span class="bv-sound-lbl">✈️ BlakeViator</span>
+            <button id="bv-sound-btn" onclick="bvToggleSound()">🔊 SOUND ON</button>
+          </div>
+          <div class="bv-stat" id="bv-stat">Loading next round...</div>
+          <div class="bv-ctrl">
+            <div class="bv-slots" id="bv-slots"></div>
+            <button class="bv-add-btn" id="bv-add-btn" onclick="bvAddSlot()">＋ ADD BET (max 3)</button>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="casino-game" id="cg-dice">
+        <div class="dice-box">
+          <div class="dice-pair"><div class="die" id="die1">⚀</div><div class="die" id="die2">⚁</div></div>
+          <div class="dice-res" id="dice-res">Pick a bet below</div>
+          <div style="width:100%">
+            <div class="mkt-ttl" style="margin-bottom:5px;">BET TYPE</div>
+            <div class="dopts">
+              <div class="dopt sel" id="dopt-high" onclick="selDice('high')">HIGH (8–12)<span class="dopt-o">1.9×</span></div>
+              <div class="dopt" id="dopt-low" onclick="selDice('low')">LOW (2–6)<span class="dopt-o">1.9×</span></div>
+              <div class="dopt" id="dopt-even" onclick="selDice('even')">EVEN<span class="dopt-o">1.95×</span></div>
+              <div class="dopt" id="dopt-odd" onclick="selDice('odd')">ODD<span class="dopt-o">1.95×</span></div>
+              <div class="dopt" id="dopt-seven" onclick="selDice('seven')">EXACT 7<span class="dopt-o">5×</span></div>
+              <div class="dopt" id="dopt-doubles" onclick="selDice('doubles')">DOUBLES<span class="dopt-o">6×</span></div>
+            </div>
+          </div>
+          <div class="c-stake">
+            <span class="bvc-lbl">Stake 🪙</span>
+            <input class="c-sinp" id="dice-st" type="number" value="50" min="10"/>
+            <div class="bvc-qrow">
+              <span class="bvq" onclick="document.getElementById('dice-st').value=20">20</span>
+              <span class="bvq" onclick="document.getElementById('dice-st').value=50">50</span>
+              <span class="bvq" onclick="document.getElementById('dice-st').value=100">100</span>
+            </div>
+          </div>
+          <button class="gbtn" id="dice-btn" onclick="rollDice()">🎲 ROLL DICE</button>
+        </div>
+      </div>
+
+      
+      <div class="casino-game" id="cg-rou">
+        <div class="rou-box">
+          <div id="rou-wheel"><div class="rou-ptr">▼</div><canvas id="rou-cv" width="196" height="196"></canvas></div>
+          <div class="rou-res" id="rou-res">Spin to win!</div>
+          <div style="width:100%">
+            <div class="mkt-ttl" style="margin-bottom:5px;">PLACE YOUR BET</div>
+            <div class="rbets">
+              <div class="rbet rb-r sel" id="rb-red" onclick="selRou('red')">🔴 RED<span class="rbet-o">2×</span></div>
+              <div class="rbet rb-b" id="rb-black" onclick="selRou('black')">⚫ BLACK<span class="rbet-o">2×</span></div>
+              <div class="rbet rb-g" id="rb-green" onclick="selRou('green')">🟢 ZERO<span class="rbet-o">14×</span></div>
+              <div class="rbet" id="rb-even" onclick="selRou('even')">EVEN<span class="rbet-o">2×</span></div>
+              <div class="rbet" id="rb-odd" onclick="selRou('odd')">ODD<span class="rbet-o">2×</span></div>
+              <div class="rbet" id="rb-high" onclick="selRou('high')">19–36<span class="rbet-o">2×</span></div>
+            </div>
+          </div>
+          <div class="c-stake">
+            <span class="bvc-lbl">Stake 🪙</span>
+            <input class="c-sinp" id="rou-st" type="number" value="50" min="10"/>
+            <div class="bvc-qrow">
+              <span class="bvq" onclick="document.getElementById('rou-st').value=20">20</span>
+              <span class="bvq" onclick="document.getElementById('rou-st').value=50">50</span>
+              <span class="bvq" onclick="document.getElementById('rou-st').value=100">100</span>
+            </div>
+          </div>
+          <button class="gbtn" id="rou-btn" onclick="spinRou()">🎡 SPIN WHEEL</button>
+        </div>
+      </div>
+
+      
+      <div class="casino-game" id="cg-slots">
+        <div class="slots-box">
+          <div style="font-family:var(--fc);font-weight:900;font-size:1rem;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">🎰 BlakeSlots</div>
+          <div class="slots-reels">
+            <div class="reel" id="reel1">🍒</div>
+            <div class="reel" id="reel2">🍋</div>
+            <div class="reel" id="reel3">⭐</div>
+          </div>
+          <div class="slots-res" id="slots-res">Match 3 to win!</div>
+          <div class="c-stake" style="width:100%;">
+            <span class="bvc-lbl">Stake 🪙</span>
+            <input class="c-sinp" id="slots-st" type="number" value="50" min="10"/>
+            <div class="bvc-qrow">
+              <span class="bvq" onclick="document.getElementById('slots-st').value=20">20</span>
+              <span class="bvq" onclick="document.getElementById('slots-st').value=50">50</span>
+              <span class="bvq" onclick="document.getElementById('slots-st').value=200">200</span>
+            </div>
+          </div>
+          <button class="gbtn" id="slots-btn" onclick="spinSlots()">🎰 SPIN</button>
+          <div class="slots-pay">
+            <div class="slots-pay-row"><span>🍒🍒🍒</span><span style="color:var(--gold)">×3</span></div>
+            <div class="slots-pay-row"><span>🍋🍋🍋</span><span style="color:var(--gold)">×4</span></div>
+            <div class="slots-pay-row"><span>🍊🍊🍊</span><span style="color:var(--gold)">×5</span></div>
+            <div class="slots-pay-row"><span>🍇🍇🍇</span><span style="color:var(--gold)">×6</span></div>
+            <div class="slots-pay-row"><span>⭐⭐⭐</span><span style="color:var(--gold)">×10</span></div>
+            <div class="slots-pay-row"><span>💎💎💎</span><span style="color:var(--gold)">×25</span></div>
+            <div class="slots-pay-row"><span>Any 2 match</span><span style="color:var(--green)">×1.5</span></div>
+            <div class="slots-pay-row"><span>No match</span><span style="color:var(--red)">×0</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PREDICTIONS PAGE -->
+    <div class="page" id="pg-predict">
+      <div style="background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);border-radius:6px;padding:8px 12px;margin-bottom:10px;text-align:center;">
+        <div style="font-family:var(--fc);font-weight:800;font-size:.88rem;color:#8b5cf6;letter-spacing:.5px;">🎯 FREE PREDICTIONS</div>
+        <div style="font-size:.66rem;color:var(--t3);margin-top:2px;">No coins needed · Correct result = 1pt · Correct score = 3pts</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div style="font-size:.72rem;color:var(--t2);">Total Points: <span id="pred-pts-total" style="color:var(--gold);font-weight:700;">0</span></div>
+        <button style="padding:5px 12px;font-family:var(--fc);font-weight:700;font-size:.7rem;border:none;border-radius:4px;background:var(--blue);color:#fff;cursor:pointer;" onclick="submitPredictions()">📨 SUBMIT</button>
+      </div>
+      <div id="pred-body">Loading fixtures...</div>
+    </div>
+
+    <!-- ACHIEVEMENTS PAGE -->
+    <div class="page" id="pg-achievements">
+      <div style="background:rgba(240,180,41,.08);border:1px solid rgba(240,180,41,.2);border-radius:6px;padding:8px 12px;margin-bottom:10px;text-align:center;">
+        <div style="font-family:var(--fc);font-weight:800;font-size:.88rem;color:var(--gold);letter-spacing:.5px;">🏅 ACHIEVEMENTS</div>
+        <div style="font-size:.66rem;color:var(--t3);margin-top:2px;">Unlock badges by playing and winning</div>
+      </div>
+      <div style="font-size:.72rem;color:var(--t2);margin-bottom:8px;">Unlocked: <span id="ach-count" style="color:var(--gold);font-weight:700;">0</span> / <span id="ach-total">0</span></div>
+      <div class="ach-grid" id="ach-grid"></div>
+    </div>
+
+    <!-- MY BETS PAGE -->
+    <div class="page" id="pg-mybets">
+      <div class="mb-tabs">
+        <div class="mbt on" id="mbt-pending" onclick="mbSwitch('pending',this)">⏳ Pending</div>
+        <div class="mbt" id="mbt-won" onclick="mbSwitch('won',this)">✅ Won</div>
+        <div class="mbt" id="mbt-lost" onclick="mbSwitch('lost',this)">❌ Lost</div>
+      </div>
+      <div id="mb-body"></div>
+    </div>
+
+    <!-- PROFILE PAGE -->
+    <div class="page" id="pg-profile">
+      <div class="prof-hdr">
+        <div class="p-av" id="p-av">?</div>
+        <div>
+          <div class="p-name" id="p-nm">—</div>
+          <div class="p-email" id="p-em">—</div>
+          <div class="p-phone" id="p-ph" style="font-size:.68rem;color:var(--t3);margin-top:1px;">—</div>
+          <div class="p-since" id="p-since">—</div>
+        </div>
+      </div>
+      <div class="coin-card">
+        <div><div class="cc-lbl">🪙 AguCoin Balance</div><div class="cc-val" id="p-coins">0</div></div>
+        <span style="font-size:2.2rem">🪙</span>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-c"><div class="stat-l">Total Bets</div><div class="stat-v" id="s-total" style="color:var(--blue)">0</div></div>
+        <div class="stat-c"><div class="stat-l">Win Rate</div><div class="stat-v" id="s-wr" style="color:var(--green)">0%</div></div>
+        <div class="stat-c"><div class="stat-l">Won 🪙</div><div class="stat-v" id="s-won" style="color:var(--green)">0</div></div>
+        <div class="stat-c"><div class="stat-l">Lost 🪙</div><div class="stat-v" id="s-lost" style="color:var(--red)">0</div></div>
+      </div>
+      
+      <div class="ref-card" style="margin-bottom:10px;">
+        <div class="ref-ttl" style="color:var(--gold);">🎁 Daily Login Bonus</div>
+        <div id="p-streak" style="font-size:.72rem;color:var(--t2);margin-bottom:6px;">Login daily to earn free AguCoins!</div>
+        <div style="display:flex;gap:8px;">
+          <button style="flex:1;padding:8px;font-family:var(--fc);font-weight:800;font-size:.76rem;letter-spacing:1px;border:none;border-radius:5px;cursor:pointer;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000;text-transform:uppercase;" onclick="showBonusModal()">🎁 CLAIM BONUS</button>
+          <button style="flex:1;padding:8px;font-family:var(--fc);font-weight:800;font-size:.76rem;letter-spacing:1px;border:none;border-radius:5px;cursor:pointer;background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff;text-transform:uppercase;" onclick="openSpinModal()">🎡 FREE SPIN</button>
+        </div>
+      </div>
+      
+      <div class="ref-card" style="margin-bottom:10px;">
+        <div class="ref-ttl" style="color:var(--blue);">📈 Detailed Stats</div>
+        <div class="stats-dash" id="stats-dash"></div>
+      </div>
+      
+      <div class="ref-card" style="margin-bottom:10px;cursor:pointer;" onclick="goPage('achievements')">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div class="ref-ttl" style="color:var(--gold);margin:0;">🏅 Achievements</div>
+          <div id="ach-profile-badge" style="font-size:.72rem;color:var(--t2);">Loading...</div>
+        </div>
+        <div style="font-size:.68rem;color:var(--t3);margin-top:4px;">Tap to view all badges →</div>
+      </div>
+      
+      <div class="ref-card">
+        <div class="ref-ttl">👥 Refer &amp; Earn</div>
+        <div class="ref-info">Share your code — you both get <strong style="color:var(--gold)">🪙 500 AguCoins</strong> when they register!</div>
+        <div class="ref-code-row" style="margin-top:8px;">
+          <div class="ref-code" id="p-refcode">—</div>
+          <button class="ref-copy" onclick="copyRefCode()">📋 COPY</button>
+        </div>
+        <div class="ref-stats">
+          <div class="ref-stat"><div class="ref-stat-n" id="p-refs">0</div><div class="ref-stat-l">Referrals</div></div>
+          <div class="ref-stat"><div class="ref-stat-n" id="p-refcoins" style="color:var(--green)">0</div><div class="ref-stat-l">Coins Earned</div></div>
+        </div>
+      </div>
+      <div class="sec-ttl">🪙 Buy AguCoins</div>
+      <div class="pack-grid">
+        <div class="pack"><div class="pack-ico">🪙</div><div class="pack-coins">500</div><div class="pack-price">KSh 50</div><button class="pack-btn" onclick="openMpesa(500,'KSh 50',50)">BUY</button></div>
+        <div class="pack"><div class="pack-ico">🪙🪙</div><div class="pack-coins">1,200</div><div class="pack-price">KSh 100</div><button class="pack-btn" onclick="openMpesa(1200,'KSh 100',100)">BUY</button></div>
+        <div class="pack"><div class="pack-ico">🪙🪙🪙</div><div class="pack-coins">3,000</div><div class="pack-price">KSh 200</div><button class="pack-btn" onclick="openMpesa(3000,'KSh 200',200)">BUY</button></div>
+        <div class="pack"><div class="pack-ico">💰</div><div class="pack-coins">8,000</div><div class="pack-price">KSh 500</div><button class="pack-btn" onclick="openMpesa(8000,'KSh 500',500)">BUY</button></div>
+        <div class="pack"><div class="pack-ico">💎</div><div class="pack-coins">20,000</div><div class="pack-price">KSh 1,000</div><button class="pack-btn" onclick="openMpesa(20000,'KSh 1,000',1000)">BUY</button></div>
+        <div class="pack"><div class="pack-ico">👑</div><div class="pack-coins">55,000</div><div class="pack-price">KSh 2,500</div><button class="pack-btn" onclick="openMpesa(55000,'KSh 2,500',2500)">BUY</button></div>
+      </div>
+      <p style="font-size:.64rem;color:var(--t3);text-align:center;margin-bottom:10px;">💳 Pay via M-PESA · Coins credited within 1–2 minutes</p>
+      <div id="admin-btn-wrap" style="display:none;margin-bottom:8px;">
+        <button style="width:100%;padding:10px;font-family:var(--fc);font-weight:800;font-size:.88rem;letter-spacing:1px;border:1px solid var(--blue);border-radius:5px;background:transparent;color:var(--blue);cursor:pointer;text-transform:uppercase;" onclick="goPage('admin')">⚙️ ADMIN DASHBOARD</button>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">🚪 LOGOUT</button>
+    </div>
+
+    <!-- ADMIN PAGE -->
+    <div class="page" id="pg-admin">
+      <div style="background:linear-gradient(135deg,#0d1e36,#1a3460);border:1px solid var(--border2);border-radius:8px;padding:12px 14px;margin-bottom:10px;text-align:center;">
+        <div style="font-family:var(--fc);font-size:1.1rem;font-weight:900;color:var(--gold);letter-spacing:1px;text-transform:uppercase;">⚙️ Admin Dashboard</div>
+        <div style="font-size:.66rem;color:var(--t3);margin-top:2px;">Agunextech · BlakeBet</div>
+      </div>
+      <div class="admin-grid" id="admin-stats"></div>
+      <div class="admin-section" id="admin-redeem-section">
+        <div class="admin-sec-hdr">💰 Redemption Requests</div>
+        <div id="admin-redeem-body"><div style="padding:12px;font-size:.74rem;color:var(--t3);text-align:center;">No requests yet</div></div>
+      </div>
+      <div class="admin-section" id="admin-users-section">
+        <div class="admin-sec-hdr">👥 Registered Users</div>
+        <div id="admin-users-body"><div style="padding:12px;font-size:.74rem;color:var(--t3);text-align:center;">Loading...</div></div>
+      </div>
+    </div>
+
+    <!-- LEADERBOARD PAGE -->
+    <div class="page" id="pg-leaderboard">
+      <div class="lb-hdr-card">
+        <div class="lb-title">🏆 BlakeBet Leaderboard</div>
+        <div class="lb-sub">Top players ranked by AguCoin balance</div>
+        <div class="lb-season" id="lb-season-lbl">Loading season info...</div>
+      </div>
+      <div class="lb-redeem-info">
+        💰 <strong>50,000 AguCoins = KSh 1,000 cash</strong><br>
+        Reach 50,000 AguCoins to qualify for M-PESA redemption.<br>
+        Every additional 50,000 coins = another KSh 1,000 · No limit.
+      </div>
+      <div class="lb-table" id="lb-body">
+        <div class="lb-empty">Loading leaderboard...</div>
+      </div>
+    </div>
+
+    <!-- ABOUT US PAGE -->
+    <div class="page" id="pg-about">
+      <div style="background:linear-gradient(135deg,#0d1e36,#1a3460);border-radius:10px;padding:20px;text-align:center;margin-bottom:14px;"><div style="font-size:2rem;">🎮</div><div style="font-family:var(--fc);font-size:1.3rem;font-weight:900;color:var(--gold);">BlakeBet</div><div style="font-size:.7rem;color:rgba(255,255,255,.6);margin-top:4px;">Virtual Games Platform by Agunextech</div></div>
+      <div class="tbl-wrap" style="margin-bottom:10px;"><div class="tbl-hdr">🏢 About Agunextech</div><div style="padding:14px;font-size:.78rem;color:var(--t2);line-height:1.8;">Agunextech is a technology company based in <strong style="color:var(--text)">Nairobi, Kenya</strong>, building innovative virtual gaming platforms for the African market. BlakeBet is our flagship product — a fully simulated sports betting and casino experience using <strong style="color:var(--text)">AguCoins</strong>. No real money is involved.</div></div>
+      <div class="tbl-wrap" style="margin-bottom:10px;"><div class="tbl-hdr">🌍 Our Mission</div><div style="padding:14px;font-size:.78rem;color:var(--t2);line-height:1.8;">To provide a fun, safe, and engaging virtual gaming experience that entertains without the risks of real gambling.</div></div>
+      <div class="tbl-wrap" style="margin-bottom:10px;"><div class="tbl-hdr">📊 Platform Stats</div><div class="admin-grid" style="padding:10px;"><div class="admin-card"><div class="admin-lbl">Leagues</div><div class="admin-val blue">20</div></div><div class="admin-card"><div class="admin-lbl">Casino Games</div><div class="admin-val blue">4</div></div><div class="admin-card"><div class="admin-lbl">Currency</div><div class="admin-val">AguCoins</div></div><div class="admin-card"><div class="admin-lbl">Platform</div><div class="admin-val green">Free</div></div></div></div>
+      <div style="text-align:center;font-size:.66rem;color:var(--t3);padding:10px;">Version 1.0 · Agunextech · Nairobi, Kenya · 🎮 Virtual Coins Only · 18+</div>
+    </div>
+
+    <!-- TERMS & CONDITIONS PAGE -->
+    <div class="page" id="pg-terms">
+      <div style="background:linear-gradient(135deg,#0d1e36,#1a3460);border-radius:10px;padding:16px;text-align:center;margin-bottom:14px;"><div style="font-family:var(--fc);font-size:1rem;font-weight:900;color:var(--gold);text-transform:uppercase;">📜 Terms &amp; Conditions</div><div style="font-size:.66rem;color:rgba(255,255,255,.5);margin-top:4px;">Last updated: March 2026</div></div>
+      <div class="tbl-wrap" style="margin-bottom:8px;"><div class="tbl-hdr" style="font-size:.76rem;">1. Virtual Platform Only</div><div style="padding:12px;font-size:.74rem;color:var(--t2);line-height:1.7;">BlakeBet is a virtual games platform. All gameplay uses AguCoins — virtual tokens with no real monetary value. No real money is wagered, won, or lost.</div></div>
+      <div class="tbl-wrap" style="margin-bottom:8px;"><div class="tbl-hdr" style="font-size:.76rem;">2. Age Requirement</div><div style="padding:12px;font-size:.74rem;color:var(--t2);line-height:1.7;">You must be 18 years or older to use BlakeBet. By registering you confirm you are at least 18.</div></div>
+      <div class="tbl-wrap" style="margin-bottom:8px;"><div class="tbl-hdr" style="font-size:.76rem;">3. AguCoins</div><div style="padding:12px;font-size:.74rem;color:var(--t2);line-height:1.7;">AguCoins are virtual tokens for gameplay only. They cannot be exchanged for real money except through our KSh redemption programme at published rates.</div></div>
+      <div class="tbl-wrap" style="margin-bottom:8px;"><div class="tbl-hdr" style="font-size:.76rem;">4. KSh Redemption</div><div style="padding:12px;font-size:.74rem;color:var(--t2);line-height:1.7;">Users with 50,000+ AguCoins may request a KSh 1,000 M-PESA payout. Redemptions are manual and subject to verification. Agunextech may refuse redemptions at its discretion.</div></div>
+      <div class="tbl-wrap" style="margin-bottom:8px;"><div class="tbl-hdr" style="font-size:.76rem;">5. Fair Use</div><div style="padding:12px;font-size:.74rem;color:var(--t2);line-height:1.7;">Users must not exploit, hack, or manipulate the platform. Suspected abuse results in account termination without notice.</div></div>
+      <div class="tbl-wrap" style="margin-bottom:8px;"><div class="tbl-hdr" style="font-size:.76rem;">6. Account Responsibility</div><div style="padding:12px;font-size:.74rem;color:var(--t2);line-height:1.7;">You are responsible for your account security. Agunextech is not liable for losses from unauthorised access.</div></div>
+      <div class="tbl-wrap" style="margin-bottom:8px;"><div class="tbl-hdr" style="font-size:.76rem;">7. Platform Availability</div><div style="padding:12px;font-size:.74rem;color:var(--t2);line-height:1.7;">Agunextech does not guarantee uninterrupted access. The platform may be updated or taken offline at any time.</div></div>
+      <div class="tbl-wrap" style="margin-bottom:8px;"><div class="tbl-hdr" style="font-size:.76rem;">8. Privacy</div><div style="padding:12px;font-size:.74rem;color:var(--t2);line-height:1.7;">We collect your name, email, and phone for account management only. We do not share your data with third parties except as required by law.</div></div>
+      <div class="tbl-wrap" style="margin-bottom:8px;"><div class="tbl-hdr" style="font-size:.76rem;">9. Changes to Terms</div><div style="padding:12px;font-size:.74rem;color:var(--t2);line-height:1.7;">Agunextech may update these terms at any time. Continued use constitutes acceptance.</div></div>
+      <div class="tbl-wrap" style="margin-bottom:8px;"><div class="tbl-hdr" style="font-size:.76rem;">10. Governing Law</div><div style="padding:12px;font-size:.74rem;color:var(--t2);line-height:1.7;">These terms are governed by the laws of Kenya. Disputes are subject to the courts of Nairobi, Kenya.</div></div>
+      <div style="text-align:center;font-size:.66rem;color:var(--t3);padding:10px;">© 2026 Agunextech. All rights reserved.</div>
+    </div>
+
+    <!-- CONTACT PAGE -->
+    <div class="page" id="pg-contact">
+      <div style="background:linear-gradient(135deg,#0d1e36,#1a3460);border-radius:10px;padding:16px;text-align:center;margin-bottom:14px;"><div style="font-family:var(--fc);font-size:1rem;font-weight:900;color:var(--gold);text-transform:uppercase;">📞 Contact Us</div><div style="font-size:.66rem;color:rgba(255,255,255,.5);margin-top:4px;">We're here to help</div></div>
+      <div class="tbl-wrap" style="margin-bottom:10px;"><div class="tbl-hdr">📬 Get in Touch</div><div style="padding:14px;"><div class="admin-row"><div class="admin-row-lbl">📧 Email</div><div class="admin-row-val" style="font-size:.76rem;">melbinance15@gmail.com</div></div><div class="admin-row"><div class="admin-row-lbl">📱 WhatsApp</div><div class="admin-row-val" style="font-size:.76rem;">+254708692155</div></div><div class="admin-row"><div class="admin-row-lbl">📍 Location</div><div class="admin-row-val" style="font-size:.76rem;">Nairobi, Kenya</div></div><div class="admin-row"><div class="admin-row-lbl">🕐 Response</div><div class="admin-row-val" style="font-size:.76rem;">Within 24 hours</div></div></div></div>
+      <div class="tbl-wrap" style="margin-bottom:10px;"><div class="tbl-hdr">💬 Send a Message</div><div style="padding:14px;"><input id="contact-name" placeholder="Your name" style="width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:9px 12px;color:var(--text);font-family:var(--fb);font-size:.82rem;outline:none;margin-bottom:8px;display:block;"/><input id="contact-subject" placeholder="Subject" style="width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:9px 12px;color:var(--text);font-family:var(--fb);font-size:.82rem;outline:none;margin-bottom:8px;display:block;"/><textarea id="contact-msg" placeholder="Your message..." rows="4" style="width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:9px 12px;color:var(--text);font-family:var(--fb);font-size:.82rem;outline:none;resize:none;margin-bottom:8px;display:block;"></textarea><button onclick="sendContactMsg()" style="width:100%;padding:10px;font-family:var(--fc);font-weight:800;font-size:.88rem;border:none;border-radius:6px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000;cursor:pointer;text-transform:uppercase;">📨 SEND MESSAGE</button></div></div>
+      <div class="tbl-wrap"><div class="tbl-hdr">❓ Common Questions</div>
+        <div style="padding:10px 14px;border-bottom:1px solid var(--border);"><div style="font-weight:700;font-size:.76rem;color:var(--text);margin-bottom:4px;">How do I redeem AguCoins?</div><div style="font-size:.72rem;color:var(--t2);line-height:1.6;">Reach 50,000 AguCoins and tap Redeem on the Leaderboard page. We send KSh 1,000 to your M-PESA within 24 hours.</div></div>
+        <div style="padding:10px 14px;border-bottom:1px solid var(--border);"><div style="font-weight:700;font-size:.76rem;color:var(--text);margin-bottom:4px;">My bet is stuck as pending?</div><div style="font-size:.72rem;color:var(--t2);line-height:1.6;">Open My Bets and tap the 🗑 Remove button on any stuck bet. Bets also auto-settle when matches finish.</div></div>
+        <div style="padding:10px 14px;border-bottom:1px solid var(--border);"><div style="font-weight:700;font-size:.76rem;color:var(--text);margin-bottom:4px;">Can I play on multiple devices?</div><div style="font-size:.72rem;color:var(--t2);line-height:1.6;">Yes — your account is in Firebase so you can log in from any browser or phone with the same credentials.</div></div>
+        <div style="padding:10px 14px;"><div style="font-weight:700;font-size:.76rem;color:var(--text);margin-bottom:4px;">Is BlakeBet real gambling?</div><div style="font-size:.72rem;color:var(--t2);line-height:1.6;">No. AguCoins are virtual tokens. No real money is at risk. The KSh redemption is a bonus reward, not a gambling payout.</div></div>
+      </div>
+    </div>
+
+    <!-- ABOUT PAGE -->
+    <div class="page" id="pg-about">
+      <div style="background:linear-gradient(135deg,#0d1e36,#1a3460);border-radius:10px;padding:20px;text-align:center;margin-bottom:14px;">
+        <div style="font-size:2.2rem;">🎮</div>
+        <div style="font-family:var(--fc);font-size:1.3rem;font-weight:900;color:var(--gold);">BlakeBet</div>
+        <div style="font-size:.7rem;color:rgba(255,255,255,.6);margin-top:4px;">Virtual Games Platform by Agunextech · Nairobi, Kenya</div>
+      </div>
+      <div class="tbl-wrap" style="margin-bottom:10px;"><div class="tbl-hdr">🏢 About Agunextech</div>
+        <div style="padding:14px;font-size:.77rem;color:var(--t2);line-height:1.8;">Agunextech is a technology company based in Nairobi, Kenya, building innovative virtual gaming platforms for the African market. BlakeBet is our flagship product — a fully simulated sports betting and casino experience powered by AguCoins, our virtual currency. No real money is involved.</div>
+      </div>
+      <div class="tbl-wrap" style="margin-bottom:10px;"><div class="tbl-hdr">🌍 Our Mission</div>
+        <div style="padding:14px;font-size:.77rem;color:var(--t2);line-height:1.8;">To provide a fun, safe, and engaging virtual gaming experience that entertains without the risks of real gambling.</div>
+      </div>
+      <div class="tbl-wrap" style="margin-bottom:10px;"><div class="tbl-hdr">📊 Platform</div>
+        <div class="admin-grid" style="padding:10px;">
+          <div class="admin-card"><div class="admin-lbl">Leagues</div><div class="admin-val blue">20</div></div>
+          <div class="admin-card"><div class="admin-lbl">Casino Games</div><div class="admin-val blue">4</div></div>
+          <div class="admin-card"><div class="admin-lbl">Currency</div><div class="admin-val">AguCoins</div></div>
+          <div class="admin-card"><div class="admin-lbl">Access</div><div class="admin-val green">Free</div></div>
+        </div>
+      </div>
+      <div style="text-align:center;font-size:.64rem;color:var(--t3);padding:8px;">Version 1.0 · 🎮 Virtual Coins Only · Not Real Money · 18+</div>
+    </div>
+
+    <!-- TERMS PAGE -->
+    <div class="page" id="pg-terms">
+      <div style="background:linear-gradient(135deg,#0d1e36,#1a3460);border-radius:10px;padding:16px;text-align:center;margin-bottom:14px;">
+        <div style="font-family:var(--fc);font-size:1rem;font-weight:900;color:var(--gold);text-transform:uppercase;">📜 Terms &amp; Conditions</div>
+        <div style="font-size:.64rem;color:rgba(255,255,255,.5);margin-top:4px;">Last updated: March 2026</div>
+      </div>
+      <div class="tbl-wrap" style="margin-bottom:7px;"><div class="tbl-hdr" style="font-size:.74rem;">1. Virtual Platform Only</div><div style="padding:11px;font-size:.73rem;color:var(--t2);line-height:1.7;">BlakeBet is a virtual games platform. All gameplay uses AguCoins — virtual tokens with no real monetary value. No real money is wagered, won, or lost.</div></div>
+      <div class="tbl-wrap" style="margin-bottom:7px;"><div class="tbl-hdr" style="font-size:.74rem;">2. Age Requirement</div><div style="padding:11px;font-size:.73rem;color:var(--t2);line-height:1.7;">You must be 18 years or older to use BlakeBet. By registering you confirm you are at least 18.</div></div>
+      <div class="tbl-wrap" style="margin-bottom:7px;"><div class="tbl-hdr" style="font-size:.74rem;">3. AguCoins</div><div style="padding:11px;font-size:.73rem;color:var(--t2);line-height:1.7;">AguCoins are virtual tokens used solely for gameplay. They cannot be exchanged for real money except through our KSh redemption programme.</div></div>
+      <div class="tbl-wrap" style="margin-bottom:7px;"><div class="tbl-hdr" style="font-size:.74rem;">4. KSh Redemption</div><div style="padding:11px;font-size:.73rem;color:var(--t2);line-height:1.7;">Users with 50,000+ AguCoins may request a KSh 1,000 M-PESA payout. Redemptions are processed manually and subject to verification. Agunextech may refuse redemptions at its discretion.</div></div>
+      <div class="tbl-wrap" style="margin-bottom:7px;"><div class="tbl-hdr" style="font-size:.74rem;">5. Fair Use</div><div style="padding:11px;font-size:.73rem;color:var(--t2);line-height:1.7;">Do not attempt to exploit, hack, or manipulate the platform. Abuse results in account termination without notice.</div></div>
+      <div class="tbl-wrap" style="margin-bottom:7px;"><div class="tbl-hdr" style="font-size:.74rem;">6. Account Security</div><div style="padding:11px;font-size:.73rem;color:var(--t2);line-height:1.7;">You are responsible for your account credentials. Agunextech is not liable for losses from unauthorised access.</div></div>
+      <div class="tbl-wrap" style="margin-bottom:7px;"><div class="tbl-hdr" style="font-size:.74rem;">7. Availability</div><div style="padding:11px;font-size:.73rem;color:var(--t2);line-height:1.7;">Agunextech does not guarantee uninterrupted access. The platform may be updated or taken offline at any time.</div></div>
+      <div class="tbl-wrap" style="margin-bottom:7px;"><div class="tbl-hdr" style="font-size:.74rem;">8. Privacy</div><div style="padding:11px;font-size:.73rem;color:var(--t2);line-height:1.7;">We collect your name, email, and phone for account management only. We do not share your data with third parties except as required by law.</div></div>
+      <div class="tbl-wrap" style="margin-bottom:7px;"><div class="tbl-hdr" style="font-size:.74rem;">9. Changes to Terms</div><div style="padding:11px;font-size:.73rem;color:var(--t2);line-height:1.7;">Agunextech may update these terms at any time. Continued use constitutes acceptance.</div></div>
+      <div class="tbl-wrap" style="margin-bottom:7px;"><div class="tbl-hdr" style="font-size:.74rem;">10. Governing Law</div><div style="padding:11px;font-size:.73rem;color:var(--t2);line-height:1.7;">These terms are governed by the laws of Kenya. Disputes are subject to the courts of Nairobi.</div></div>
+      <div style="text-align:center;font-size:.64rem;color:var(--t3);padding:8px;">© 2026 Agunextech. All rights reserved.</div>
+    </div>
+
+    <!-- CONTACT PAGE -->
+    <div class="page" id="pg-contact">
+      <div style="background:linear-gradient(135deg,#0d1e36,#1a3460);border-radius:10px;padding:16px;text-align:center;margin-bottom:14px;">
+        <div style="font-family:var(--fc);font-size:1rem;font-weight:900;color:var(--gold);text-transform:uppercase;">📞 Contact Us</div>
+        <div style="font-size:.64rem;color:rgba(255,255,255,.5);margin-top:4px;">We respond within 24 hours</div>
+      </div>
+      <div class="tbl-wrap" style="margin-bottom:10px;"><div class="tbl-hdr">📬 Get in Touch</div>
+        <div style="padding:12px;">
+          <div class="admin-row"><div class="admin-row-lbl">📧 Email</div><div class="admin-row-val" style="font-size:.75rem;">melbinance15@gmail.com</div></div>
+          <div class="admin-row"><div class="admin-row-lbl">📱 WhatsApp</div><div class="admin-row-val" style="font-size:.75rem;">+254708692155</div></div>
+          <div class="admin-row"><div class="admin-row-lbl">📍 Location</div><div class="admin-row-val" style="font-size:.75rem;">Nairobi, Kenya</div></div>
+        </div>
+      </div>
+      <div class="tbl-wrap" style="margin-bottom:10px;"><div class="tbl-hdr">💬 Send a Message</div>
+        <div style="padding:12px;">
+          <input id="contact-name" placeholder="Your name" style="width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:9px 12px;color:var(--text);font-family:var(--fb);font-size:.82rem;outline:none;margin-bottom:8px;display:block;"/>
+          <input id="contact-subject" placeholder="Subject" style="width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:9px 12px;color:var(--text);font-family:var(--fb);font-size:.82rem;outline:none;margin-bottom:8px;display:block;"/>
+          <textarea id="contact-msg" placeholder="Your message..." rows="4" style="width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:9px 12px;color:var(--text);font-family:var(--fb);font-size:.82rem;outline:none;resize:none;margin-bottom:8px;display:block;"></textarea>
+          <button onclick="sendContactMsg()" style="width:100%;padding:10px;font-family:var(--fc);font-weight:800;font-size:.88rem;border:none;border-radius:6px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000;cursor:pointer;text-transform:uppercase;">📨 SEND MESSAGE</button>
+        </div>
+      </div>
+      <div class="tbl-wrap"><div class="tbl-hdr">❓ FAQ</div>
+        <div style="padding:10px 14px;border-bottom:1px solid var(--border);"><div style="font-weight:700;font-size:.75rem;color:var(--text);margin-bottom:3px;">How do I redeem AguCoins?</div><div style="font-size:.71rem;color:var(--t2);line-height:1.6;">Reach 50,000 AguCoins and tap Redeem on the Leaderboard page. We send KSh 1,000 to your M-PESA within 24 hours.</div></div>
+        <div style="padding:10px 14px;border-bottom:1px solid var(--border);"><div style="font-weight:700;font-size:.75rem;color:var(--text);margin-bottom:3px;">My bet is stuck as pending?</div><div style="font-size:.71rem;color:var(--t2);line-height:1.6;">Open My Bets and tap the 🗑 Remove button on any stuck bet.</div></div>
+        <div style="padding:10px 14px;border-bottom:1px solid var(--border);"><div style="font-weight:700;font-size:.75rem;color:var(--text);margin-bottom:3px;">Can I play on multiple devices?</div><div style="font-size:.71rem;color:var(--t2);line-height:1.6;">Yes — your account is in Firebase, log in from any browser with the same email and password.</div></div>
+        <div style="padding:10px 14px;"><div style="font-weight:700;font-size:.75rem;color:var(--text);margin-bottom:3px;">Is BlakeBet real gambling?</div><div style="font-size:.71rem;color:var(--t2);line-height:1.6;">No. AguCoins are virtual tokens. No real money is at risk.</div></div>
+      </div>
+    </div>
+
+  </div><!-- end content -->
+
+  <!-- BOTTOM NAV — 5 tabs -->
+  <div id="botnav">
+    <div class="bni on" id="bni-sports" onclick="goPage('sports')">
+      <div class="bni-ico">⚽</div>
+      <div class="bni-lbl">Sports</div>
+    </div>
+    <div class="bni" id="bni-casino" onclick="goPage('casino')">
+      <div class="bni-ico">🎰</div>
+      <div class="bni-lbl">Casino</div>
+    </div>
+    <div class="bni" id="bni-mybets" onclick="goPage('mybets')" style="position:relative;">
+      <div class="bni-ico">🎫</div>
+      <div class="bni-lbl">My Bets</div>
+      <div class="bni-badge" id="pend-badge">0</div>
+    </div>
+    <div class="bni" id="bni-leaderboard" onclick="goPage('leaderboard')">
+      <div class="bni-ico">🏆</div>
+      <div class="bni-lbl">Top</div>
+    </div>
+    <div class="bni" id="bni-profile" onclick="goPage('profile')">
+      <div class="bni-ico">👤</div>
+      <div class="bni-lbl">Account</div>
+    </div>
+  </div>
+
+  <!-- POWERED BY -->
+  <div id="powered">
+    <span>Powered by <a href="https://www.google.com/search?q=Agunextech" target="_blank">Agunextech</a></span>
+    <span>·</span>
+    <span style="cursor:pointer;color:var(--blue);" onclick="goPage('about')">About</span>
+    <span>·</span>
+    <span style="cursor:pointer;color:var(--blue);" onclick="goPage('terms')">T&amp;C</span>
+    <span>·</span>
+    <span style="cursor:pointer;color:var(--blue);" onclick="goPage('contact')">Contact</span>
+  </div>
+
+</div><!-- end app -->
+
+<!-- NOTIFICATION PANEL -->
+<div id="notif-panel">
+  <div class="notif-hdr">🔔 Notifications <button onclick="clearNotifs()" style="background:none;border:none;color:var(--t3);font-size:.7rem;cursor:pointer;">Clear all</button></div>
+  <div id="notif-list"><div style="padding:14px;text-align:center;font-size:.74rem;color:var(--t3);">No notifications yet</div></div>
+</div>
+
+
+<div id="spin-modal">
+  <div class="spin-box">
+    <div class="spin-title">🎡 Daily Free Spin</div>
+    <div style="font-size:.68rem;color:var(--t3);margin-bottom:8px;" id="spin-sub">Spin once per day for free AguCoins!</div>
+    <div class="spin-wheel-wrap">
+      <canvas id="spin-canvas" width="200" height="200"></canvas>
+      <div class="spin-pointer">▼</div>
+    </div>
+    <div class="spin-result" id="spin-result"></div>
+    <button class="spin-btn" id="spin-btn" onclick="doSpin()">🎡 SPIN NOW</button>
+    <button class="bonus-skip" onclick="closeSpinModal()">Close</button>
+  </div>
+</div>
+
+<!-- SHARE MODAL -->
+<div id="share-modal">
+  <div class="share-box">
+    <div style="font-family:var(--fc);font-weight:800;font-size:.9rem;color:var(--text);margin-bottom:12px;">🏆 Share Your Win!</div>
+    <div class="share-card" id="share-card-inner">
+      <div class="share-card-logo">BlakeBet 🎮</div>
+      <div class="share-card-amt" id="share-amt">🪙 0</div>
+      <div class="share-card-lbl" id="share-lbl">AguCoins Won</div>
+    </div>
+    <div style="font-size:.7rem;color:var(--t3);margin-bottom:12px;">Screenshot this card and share with friends!</div>
+    <button class="spin-btn" onclick="closeShareModal()">✓ DONE</button>
+  </div>
+</div>
+
+<!-- CHAT BUTTON & MODAL -->
+<button id="chat-btn" class="on" onclick="openChat()">💬<div id="chat-badge"></div></button>
+<div id="chat-modal" onclick="if(event.target===this)closeChat()">
+  <div class="chat-box">
+    <div class="chat-hdr">
+      <div class="chat-hdr-ttl">💬 Live Chat <span id="chat-status-dot" style="font-size:.6rem;color:var(--t3);font-weight:400;font-family:var(--fb);">· local only</span></div>
+      <button class="chat-close" onclick="closeChat()">✕</button>
+    </div>
+    <div class="chat-msgs" id="chat-msgs"></div>
+    <div class="chat-inp-row">
+      <input class="chat-inp" id="chat-inp" placeholder="Say something..." maxlength="120" onkeydown="if(event.key==='Enter')sendChat()"/>
+      <button class="chat-send" onclick="sendChat()">➤</button>
+    </div>
+  </div>
+</div>
+
+<!-- DAILY BONUS MODAL -->
+<div id="bonus-modal">
+  <div class="bonus-box">
+    <div style="font-size:2.2rem;margin-bottom:6px;">🎁</div>
+    <div class="bonus-title">Daily Bonus!</div>
+    <div class="bonus-streak" id="bonus-streak-txt">Day 1 of 7</div>
+    <div class="bonus-days" id="bonus-days-row"></div>
+    <div style="font-size:.78rem;color:var(--t2);margin-bottom:14px;">Today's reward: <span id="bonus-today-amt" style="color:var(--gold);font-weight:700;font-family:var(--mono);">🪙 100</span></div>
+    <button class="bonus-claim" id="bonus-claim-btn" onclick="claimBonus()">🎁 CLAIM BONUS</button>
+    <button class="bonus-skip" onclick="closeBonusModal()">Maybe later</button>
+  </div>
+</div>
+<div id="mpesa-modal">
+  <div class="mpesa-box">
+    <div class="mpesa-logo">📱 M-PESA Payment</div>
+    <div class="mpesa-pack">
+      <div class="mpesa-coins" id="mp-coins">500 🪙</div>
+      <div class="mpesa-price" id="mp-price">KSh 50</div>
+    </div>
+    <div class="mpesa-lbl">M-PESA Phone Number</div>
+    <input class="mpesa-inp" id="mp-phone" type="tel" placeholder="e.g. 0708692155"/>
+    <div class="mpesa-status" id="mp-status"></div>
+    <button class="mpesa-btn" id="mp-btn" onclick="mpesaSubmit()">📲 SEND STK PUSH</button>
+    <button class="mpesa-cancel" onclick="closeMpesa()">CANCEL</button>
+    <div style="font-size:.6rem;color:var(--t3);text-align:center;margin-top:8px;line-height:1.6;">
+      An M-PESA prompt will be sent to your phone.<br>Enter your PIN to complete payment.<br>
+      Coins will be credited within 1–2 minutes after confirmation.
+    </div>
+  </div>
+</div>
+
+
+<button id="bs-float" onclick="openBS()">🎯 Slip <div id="bs-fcnt">0</div></button>
+
+
+<div id="bs-overlay" onclick="closeBS()"></div>
+<div id="bs-panel">
+  <div class="bs-drag"></div>
+  <div class="bs-hdr">
+    <div class="bs-ttl">Bet Slip <div class="bs-cnt" id="bs-cnt">0</div></div>
+    <button class="bs-close" onclick="closeBS()">✕</button>
+  </div>
+  <div class="bs-body" id="bs-body"></div>
+  <div class="bs-foot" id="bs-foot" style="display:none;">
+    <div class="bsrow"><span class="bsrl">Selections</span><span class="bsrv" id="bs-sels" style="color:var(--t2)">0/21</span></div>
+    <div class="bsrow"><span class="bsrl">Total Odds</span><span class="bsrv" id="bs-odds">1.00</span></div>
+    <input class="bs-sinp" id="bs-stake" type="number" value="50" min="10" placeholder="Stake (AguCoins 🪙)" oninput="renderBS()"/>
+    <div class="bs-qrow">
+      <span class="bsqs" onclick="setSt(20)">20</span><span class="bsqs" onclick="setSt(50)">50</span><span class="bsqs" onclick="setSt(100)">100</span><span class="bsqs" onclick="setSt(200)">200</span><span class="bsqs" onclick="setSt(500)">500</span><span class="bsqs" onclick="setSt(1000)">1K</span>
+    </div>
+    <div class="bs-winrow"><span class="bs-wl">🪙 Possible Win</span><span class="bs-wv" id="bs-win">0</span></div>
+    <div id="bs-maxwarn" class="bs-warn" style="display:none;">⚠ Maximum 21 selections</div>
+    <button class="btn-place" onclick="placeBet()">PLACE BET</button>
+    <button class="btn-clr" onclick="clearSlip()">CLEAR SLIP</button>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div id="modal"><div class="mbox"><div class="mico" id="m-ico">🏆</div><div class="mttl" id="m-ttl">YOU WON!</div><div class="mamt" id="m-amt"></div><div class="mdet" id="m-det"></div><button class="mclose" onclick="closeModal()">CONTINUE</button></div></div>
+<div id="toastwrap"></div>
+
+<!-- ═══ SCRIPTS — loaded in dependency order ═══ -->
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/betting.js"></script>
+<script src="js/casino.js"></script>
+<script src="js/ui.js"></script>
+
+</body>
+</html>
